@@ -37,6 +37,18 @@ Details my Skills on Time Series Analysis
 
 **O) Suggestion Box**
 
+**XIV) Appendix / FAQ Intro**
+
+**A) What is the Appendix?**
+
+**XV) Setting up your Environment FAQ**
+
+**A) Pre-Installation Check**
+
+**B) Anaconda Environment Setup**
+
+**C) How to install Numpy, Scipy, Matplotlib, Pandas, IPython, Theano, and TensorFlow**
+
 ## **I) Introduction and Outline**
 
 This course provides a comprehensive guide to analyzing time series data with Python, combining both classical statistical methods and modern machine learning techniques. It begins with a foundation in time series basics, ensuring that learners new to the subject understand the types of data that qualify as time series, essential transformations, evaluation metrics, and a primer on financial time series concepts like log prices, log returns, and randomness.
@@ -1102,3 +1114,304 @@ Provide detailed examples to make feedback actionable.
 Use the suggestion box to request topics not included or to propose new course ideas.
 
 The goal is to create a two-way communication channel so the course can be continuously improved based on concrete student feedback.
+
+
+
+
+
+
+
+## **XIV) Appendix / FAQ Intro**
+
+**A) What is the Appendix?**
+
+In this video, I want to introduce this next section of the course, which is called the FAQ or appendix. I think this is important because historically, some students have been confused about what this section is all about. I hope that this lecture clears things up, but if I've said something here that you don't understand, please mention it on the Q&A.
+
+Okay, so firstly I'll provide some historical context. In my original courses, none of them had an appendix. Over time, in response to questions I was getting almost every day, I decided to simply create video lectures to answer these questions. Obviously, this was better than trying to answer the same emails one by one.
+
+Now, I was surprised by this, but it's true. Some students had no idea what appendix meant. No, it's not just a body part that people sometimes get removed. If you're into reading books, you may have noticed that many books also have an appendix. Usually these are included at the end of a book to provide supplementary information and context. That is, it's not part of the main contents of the book.
+
+For example, I might be reading a book that teaches probability, and the appendix will include some identities from calculus. This doesn't mean that calculus is taught as part of probability, but rather it's considered to be useful supplementary material. So hopefully now the concept of appendix is clear.
+
+At the same time, I couldn't depend on students to understand what appendix meant before I even got the chance to explain it. And so I ended up giving it another name, which I think is more descriptive, which is FAQ. FAQ stands for Frequently Asked Questions. So hopefully now there is no doubt as to what this section is for.
+
+Firstly, you might be wondering if you have to watch all this content. It's quite long in some courses after all. The answer is no. These sections are entirely optional. Of course, if you don't have these questions yourself, there's no reason for you to listen to the answers to these questions. However, I will say that some students in the past actually did have these questions while simultaneously skipping over these sections.
+
+So try to think about whether or not any of these lectures may be helpful to you, or at least consider whether you might just be curious about any of these topics. I'll say that based on experience, there is a non-zero chance that you skip over something you actually needed. For example, if you went through this whole course and didn't do any exercises, you probably need to watch a few lectures in this FAQ. If you thought this course would be for beginners and you found the content way over your head, you need to watch a few lectures in this FAQ. If you're having trouble understanding the code format because you only know how to run Jupyter Notebooks, you need to watch a few lectures.
+
+In this FAQ, I'll remind you that these are common questions, but not necessarily your questions. There could be questions here that you don't care about, and that's fine since it's optional. There could be questions you have that aren't covered, and that's fine too. Why? Because we already have a mechanism for that, which is the Q&A.
+
+Now, I'm sure you're tired of me saying this by now, but so many students ignore this that I feel the need to repeat it often. Ask any and all questions on the Q&A. This is why it's the number one rule from how to succeed in this course. Although putting your question in my suggestion box is fine and you will still get an answer, the better choice is to just put your question on the Q&A and get it answered immediately.
+
+My goal in this course is for you to have zero questions left about this topic by the end of this course. But my success at reaching this goal requires your participation. The only way for you to get your questions answered is to actually ask them in the first place. So please don't hesitate to do so.
+
+**Notes:**
+
+In this lecture, the instructor introduces the FAQ (Frequently Asked Questions) or appendix section of the course. The purpose is to provide supplementary material that clarifies common questions and resolves recurring student doubts.
+
+Students are informed that the FAQ is optional. They do not need to watch all content unless it is relevant to their situation. Examples of relevance include: skipping exercises, finding the course content too advanced, or needing help with code formats such as Jupyter Notebooks.
+
+The instructor explains the historical context: original courses did not have an appendix, so video lectures were created to answer frequent questions instead of responding to individual emails. The appendix provides supplementary information, similar to how books include additional material at the end without being part of the main content. The term FAQ is used as a more descriptive name.
+
+Students are reminded that the FAQ may contain common questions that do not necessarily apply to them. If a student’s personal question is not covered, they are encouraged to use the Q&A system for immediate answers. Participation is emphasized as essential for course success: students must actively ask questions to have all doubts addressed.
+
+The instructor highlights that following the Q&A rule is the number one strategy to succeed in the course. Suggestion boxes are acceptable but slower; using Q&A ensures faster responses. The ultimate goal is for students to leave the course with zero unanswered questions, but this requires proactive engagement.
+
+**Summary:**
+
+This lecture introduces the FAQ or appendix section, which contains supplementary material addressing common student questions. The section is optional, but can be helpful for those skipping exercises, finding the content challenging, or needing guidance with code formats.
+
+The FAQ originated as a solution to repeated student queries and provides context similar to a book’s appendix. While it addresses common questions, personal questions not included can be asked on Q&A for immediate answers.
+
+Students are reminded that active participation is essential: using the Q&A system is the primary way to ensure all doubts are resolved. The goal is for students to leave the course with zero unanswered questions, and proactive engagement is required to achieve this.
+
+# **XV) Setting up your Environment FAQ**
+
+**A) Pre-Installation Check**
+
+Okay. So in this lecture, I want to give you guys a little bit of a disclaimer before we proceed to the installation lectures. So the thing you have to keep in mind is that these installation lectures are only guidelines. Okay? These are generic lectures that I created at one point in time to cover all my courses at once. And obviously this is the most scalable way to distribute such lectures because I don't want to have to create another lecture installing stuff from scratch every single time I create a course, which is pretty often.
+
+So just to give you guys a little bit of history about why this lecture exists, in fact, this lecture never used to exist. So when I first created my courses, I didn't have any installation lectures because I didn't know that people didn't know how to install Python. And this is because Python was a prerequisite to those courses. So basically if you came to the course and you didn't know how to install Python or install Python libraries, you basically failed to meet the prerequisites.
+
+Now, because I'm such a nice person, I decided to include an installation lecture eventually to handle these cases. So I was honestly surprised that people trying to get into machine learning didn't know how to install Python. Okay, this is kind of like learning Python today and then trying to learn machine learning tomorrow, right? That's a very compressed way of learning machine learning. And that's not generally how it works in the real world.
+
+Okay. So in the real world, how it's usually going to happen is you're going to learn Python first. So you're going to have a pretty good handle on Python syntax, writing basic programs in Python, maybe even more complicated programs. But in general, installing Python is like the first step of that. So if you don't know how to install Python and you don't know how to use Python, how are you even going to implement a complicated machine learning algorithm in Python, you know, two days after learning Python? I don't think that's realistic.
+
+So one of the things you have to keep in mind is my famous rule, which applies to a lot of things in this course, is learn the principles, not the syntax. Okay? So what this means is it's more about understanding what we are doing and why we are doing it. Okay? It's about understanding. Whereas if you're focused solely on the syntax, what this means is that you're probably taking a more monkey-see-monkey-do approach, which is not correct. It's not about just typing exactly character for character what I typed; it's more about understanding.
+
+So for example, I show you how to install a few libraries using PIP, like pip install <library_name>, so it's pip install blah blah blah. So this doesn't mean you're going to install every library I installed. This means I'm showing you how to install a library so that if you come across a library that you need that you haven't yet installed, now you know how to install it. Okay. So that's sort of understanding the theme of what we are doing rather than just rote copying of the characters that I'm typing on the screen, which doesn't require any understanding at all. Okay. So it's understanding that's important. So if you're understanding, that's good. And if you're not understanding, that's not good.
+
+Okay. So as an example of this, in these lectures, you're going to see me install some libraries called Cntk and Theano, both of which are no longer maintained. So Theano was the first deep learning library to take advantage of the GPU in Python, which was the most popular around maybe ten years ago. Then we have S.A.K., which was Microsoft's deep learning library. So don't install these. These are just examples.
+
+Another example is OpenAI Gym, which is used in some courses, but not all courses. So you really want to pay attention to what course you're in. For example, if you're in a reinforcement learning course where we are using OpenAI Gym, then that's a case where you'd want to install it. If you're not in a reinforcement learning course and you have no idea what OpenAI Gym is, then don't install it.
+
+**Notes:**
+
+Purpose of Lecture: Disclaimer before installation lectures; lectures are guidelines.
+
+Generic Nature: Installation lectures were created once to cover multiple courses; scalable approach.
+
+Historical Context:
+
+Original courses did not have installation lectures.
+
+Python was a prerequisite; students needed prior knowledge.
+
+Added installation lectures later to help students unfamiliar with Python.
+
+Learning Principle: Focus on learning principles, not syntax; avoid “monkey-see-monkey-do” copying.
+
+Installation Examples:
+
+Libraries shown using PIP: pip install <library_name>
+
+Examples like Cntk, Theano, and S.A.K. are outdated; do not install.
+
+OpenAI Gym is relevant only if the course requires it.
+
+Key Message: Understand why and how installations work; don’t just copy commands.
+
+**Summary:**
+
+This lecture provides a disclaimer for the installation lectures, emphasizing that they are general guidelines rather than course-specific instructions. These lectures were created once to cover multiple courses efficiently, saving the instructor from creating new installation instructions for every course. Initially, installation lectures did not exist, as Python was assumed to be a prerequisite. Later, they were added to support students unfamiliar with Python.
+
+The instructor stresses the importance of learning principles over syntax, encouraging students to understand the reasoning behind installations rather than merely copying commands. While libraries like Cntk, Theano, and S.A.K. may be installed as examples, they are outdated and should not be used. Similarly, OpenAI Gym is only relevant in reinforcement learning courses. The main takeaway is that students should focus on understanding the process of installing and managing libraries, rather than rote execution of commands like pip install <library_name>.
+
+**B) Anaconda Environment Setup**
+
+Everyone and welcome back to this class. In this lecture, I'm going to go over a better way to install data science and machine learning libraries for Python for Windows users. Historically, Windows users have had a lot of problems installing this stuff. Luckily these days there is an option that makes things very painless and just as easy as they are on Linux or Mac, and that is Anaconda. In fact, even if you're not on Windows, you can still use Anaconda. It's nice because it isolates your environment from the defaults provided on your system. So, for example, you can have Python 3 in Anaconda but Python 2 as your system default.
+
+When I first started these courses, I wasn't keen on Windows since there were a few central libraries that couldn't be installed on Windows without a significant amount of effort. Anything beyond a couple of lines in the console or clicking an install file is too much. And believe me, some students even have trouble with that, so it's good not to make things too complicated before you can even begin the course. Nowadays that has changed. It's a lot easier to install things on Windows in large part thanks to Anaconda. This lecture is all about how to install all the data science and machine learning libraries you'll need on Windows using Anaconda.
+
+In this lecture, I'm going to walk you through how to install Anaconda as well as some of the libraries you might need that don't already come with Anaconda. Most of the common libraries, such as NumPy, SciPy, and Pandas, are already included. So if that's all you want to use, then for you, it's just a one-click install. On this slide, I'm going to give you a super short summarized version of this lecture so you don't have to walk through the installation with me if you don't want to.
+
+(i) Download and install Anaconda: This is just a one-click install. It already includes NumPy, SciPy, Pandas, and other essentials. It also comes with NLTK for NLP and scikit-learn, which has pre-built machine learning models. Even though these come by default, you can still update them using commands like conda update numpy.
+
+(ii) Install deep learning libraries:
+
+TensorFlow: pip install tensorflow
+
+Keras: First update pip using conda install pip, then pip install keras
+
+Cntk (Microsoft's deep learning library): pip install <path_to_cntk_wh_file> (downloaded from Microsoft website)
+
+PyTorch: conda install -c peterjc123 pytorch (custom Windows build)
+
+Vienna: conda install vienna (or CPU version if no GPU)
+
+(iii) Install OpenAI Gym (optional for reinforcement learning): pip install gym. To play Atari games or save videos, you may also need FFMPEG: conda install -c menohs ffmpeg.
+
+Next, go to the Anaconda website (anaconda.com/download) and scroll down to the Windows section. Click on either Python 3.6 or Python 2.7 depending on your needs. Python 3 is newer, but some platforms (like Google App Engine) may require Python 2. The course code is compatible with both. Once downloaded, click the install file for a one-click installation.
+
+After installation, open the Anaconda Prompt from the Start menu. Type python to start Python. You can import all default libraries like NumPy, Pandas, scikit-learn, and NLTK to verify they are installed. Try generating random numbers or plotting a histogram as a simple test.
+
+If TensorFlow is not installed, run pip install tensorflow. For Keras, first update pip: conda install pip, then pip install keras. For Cntk, download the appropriate WH file from Microsoft’s website and install with pip install <path_to_wh_file>. For PyTorch, use the custom Windows command: conda install -c peterjc123 pytorch.
+
+For Vienna, install either CPU or GPU version depending on your setup. Check if the library works by running a simple Python script like adding numbers. If you encounter MKL service issues, you may need to set environment variables on Windows.
+
+Finally, for OpenAI Gym (reinforcement learning), install using pip install gym, and if you want to save videos, install FFMPEG using conda install -c menohs ffmpeg. Test your installation by running sample scripts for Atari games or other Gym environments. All libraries are now ready for use. Any future updates or new library installations will be appended to this lecture.
+
+**Notes:**
+
+Purpose: Simplified installation process for Windows using Anaconda, to avoid historical issues.
+
+Anaconda Benefits:
+
+Isolates Python environment from system default.
+
+Includes common libraries like NumPy, SciPy, Pandas, NLTK, scikit-learn by default.
+
+One-click installation.
+
+Deep Learning Libraries Installation:
+
+TensorFlow: pip install tensorflow
+
+Keras: Update pip conda install pip, then pip install keras
+
+Cntk: Download WH file and install pip install <path_to_wh_file>
+
+PyTorch: conda install -c peterjc123 pytorch
+
+Vienna: CPU or GPU version via conda install vienna
+
+Reinforcement Learning Libraries (Optional):
+
+OpenAI Gym: pip install gym
+
+For video saving: FFMPEG via conda install -c menohs ffmpeg
+
+Python Version Choice: Python 3 recommended; Python 2 supported for legacy reasons.
+
+Verification: Open Anaconda Prompt → type python → import libraries → run simple tests (plots, random numbers).
+
+Troubleshooting:
+
+Update pip if errors occur.
+
+Set environment variables for MKL issues.
+
+Use pre-compiled WH files for Windows-specific libraries.
+
+**Summary:**
+
+This lecture provides a comprehensive guide for Windows users to install Python data science and machine learning libraries using Anaconda. Anaconda simplifies installation by isolating environments and including most common libraries like NumPy, SciPy, Pandas, NLTK, and scikit-learn. It allows users to manage Python versions independently from the system default.
+
+For deep learning, libraries like TensorFlow, Keras, Cntk, PyTorch, and Vienna can be installed using pip or conda commands, with specific instructions for Windows users when necessary. Optional reinforcement learning libraries like OpenAI Gym and FFMPEG for video functionality can also be installed following provided steps.
+
+After installation, students can verify success by opening the Anaconda Prompt, starting Python, and importing the libraries. Simple tests like generating random numbers, plotting histograms, or running sample scripts ensure proper setup. Any issues like pip version mismatches or MKL service errors can be resolved using environment variable adjustments or updated installation files. Overall, Anaconda provides a stable and easy-to-manage environment for all Python-based data science and machine learning projects on Windows.
+
+**C) How to install Numpy, Scipy, Matplotlib, Pandas, IPython, Theano, and TensorFlow**
+
+Hey, guys, in this lecture, I'm going to show you how to set up your development environment so that you can follow along in these courses. First, let's talk about operating systems. The three big ones are Windows, Linux, and Mac. Most, but not all, of my courses are part of the Deep Learning series. Eventually, the deep learning models we build will become so complex that we will need specialized libraries like TensorFlow to implement them.
+
+As of today, TensorFlow is not officially supported on Windows. So if you are interested in deep learning, you will discover pretty soon that there is not much you can do without a ton of work. Even working with non-GPU enabled libraries like NumPy and Matplotlib can be a challenge, but these are at least possible on Windows. If you really must use Windows and have your Python environment inside of Windows and don't want to try the virtual machine method, then one good library is Anaconda, which you can get at Continuum IO downloads. I haven't used it myself extensively, but others have found it usable.
+
+From experience, Python development, especially involving the NumPy/SciPy stack, is not easy on Windows. The method I'm going to describe using virtual machines will work on most modern computers. If you want to do any deep learning with TensorFlow or similar libraries, you cannot do this easily on Windows.
+
+For courses that do not require TensorFlow, you can work on Windows. Examples include linear regression in Python, logistic regression in Python, deep learning in Python part 1 (mostly NumPy), easy NLP in Python, data analytics for beginners, cluster analysis, unsupervised machine learning in Python, and Hidden Markov models in Python.
+
+Courses that heavily depend on TensorFlow or PyTorch include practical deep learning in TensorFlow, CNNs in Python, unsupervised deep learning in Python, and recurrent neural networks in Python.
+
+Using a virtual machine is highly recommended, as Windows is not as developer-friendly. On a Mac, you can often install NumPy, SciPy, Pandas, Matplotlib, TensorFlow, and PyTorch directly using pip install or easy_install. Sometimes errors happen due to version conflicts, but Googling the error usually resolves it.
+
+If you want to use a virtual machine, you will need VirtualBox and a lightweight Linux distribution such as Ubuntu 64-bit. Download both and install VirtualBox first. Then, create a new machine in VirtualBox, choose a name, allocate memory (2GB or more), create a virtual hard disk (dynamically allocated, ~8GB is sufficient), and attach the Ubuntu ISO you downloaded. Start the VM and follow installation prompts, selecting “Erase disk and install Ubuntu.” Once installed, restart the machine.
+
+To make the virtual machine window resizable and enable features like copy-paste between host and VM, install Guest Additions. Open the terminal and navigate to the folder containing your setup scripts. If any commands fail, install required packages using:
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install build-essential
+
+
+After this, commands should work. Restart the VM if needed.
+
+Now install Python and libraries for data science using:
+
+sudo apt-get install python3 python3-pip python3-dev python3-setuptools python3-matplotlib python3-numpy
+
+
+Test installation by running python3, then:
+
+import numpy
+import matplotlib
+import pandas
+
+
+Install pandas:
+
+pip3 install --upgrade pandas
+
+
+Finally, install TensorFlow by copying the latest installation command from the TensorFlow website. Test installation using a sample script from GitHub (lazyprogrammer/machine-learning-examples):
+
+git clone https://github.com/lazyprogrammer/machine-learning-examples.git
+cd machine-learning-examples/in_class_2
+python3 tensorflow_intro.py
+
+
+Make sure to install the CPU-only version of TensorFlow to avoid GPU compatibility issues.
+
+For editing code, the recommended editor is Sublime Text. Download the 64-bit installer for your OS and install it. Open the cloned GitHub repository to access all course code. You are now ready to run Python, NumPy, Matplotlib, Pandas, and TensorFlow examples in your virtual machine environment.
+
+**Notes:**
+
+Purpose: Guide for setting up a consistent development environment using Linux VM for deep learning.
+
+Operating Systems: Windows, Linux, Mac. Windows has library support issues for TensorFlow and PyTorch. Mac users can install libraries using pip or easy_install.
+
+VM Recommendation: Use VirtualBox + Ubuntu 64-bit to ensure cross-platform consistency.
+
+Courses That Can Run on Windows: Linear/Logistic Regression, introductory deep learning (NumPy only), NLP, data analytics, cluster analysis, unsupervised ML, Hidden Markov models.
+
+Courses That Require TensorFlow/PyTorch: Practical deep learning, CNNs, unsupervised deep learning, RNNs.
+
+VM Setup Steps:
+
+Download VirtualBox & Ubuntu ISO
+
+Create VM, allocate memory, attach ISO
+
+Install Ubuntu, restart VM
+
+Install Guest Additions for window resizing and copy-paste
+
+Update and upgrade packages:
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install build-essential
+
+
+Python & Library Installation:
+
+sudo apt-get install python3 python3-pip python3-dev python3-setuptools python3-matplotlib python3-numpy
+pip3 install --upgrade pandas
+
+
+TensorFlow Installation: Copy the latest command from TensorFlow website (CPU-only recommended).
+
+Testing Environment: Use GitHub repo:
+
+git clone https://github.com/lazyprogrammer/machine-learning-examples.git
+cd machine-learning-examples/in_class_2
+python3 tensorflow_intro.py
+
+
+Recommended Text Editor: Sublime Text 64-bit.
+
+**Summary:**
+
+This lecture demonstrates how to set up a development environment for deep learning courses, especially for users on Windows. Because Windows does not fully support TensorFlow or PyTorch, a virtual machine running Ubuntu Linux is recommended. This ensures all students can follow the same instructions and have a consistent environment.
+
+For Windows users who prefer not to use a VM, Anaconda is suggested for managing Python environments and installing core libraries like NumPy, SciPy, Matplotlib, and Pandas. For Mac users, libraries can usually be installed directly using pip install or easy_install, though version conflicts may arise.
+
+Setting up a VM involves installing VirtualBox, creating a new VM with Ubuntu 64-bit, allocating memory, attaching the Ubuntu ISO, installing the OS, and adding Guest Additions for usability. Data science libraries are then installed using apt-get and pip commands. TensorFlow is installed separately using the latest CPU-only version from the TensorFlow website.
+
+Once setup is complete, students can verify installations using simple Python scripts, clone course examples from GitHub, and use Sublime Text for editing. This ensures all students can run and test deep learning code without dependency or OS-related issues, providing a stable and uniform learning environment.
+
+
+
+
+
+
