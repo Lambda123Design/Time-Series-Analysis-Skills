@@ -37,6 +37,14 @@ Details my Skills on Time Series Analysis
 
 **O) Suggestion Box**
 
+**IV) Exponential Smoothing and ETS Methods**
+
+**A) Exponential Smoothing Section Introduction**
+
+**B) Exponential Smoothing Intuition for Beginners**
+
+**C) SMA Theory**
+
 **XIV) Appendix / FAQ Intro**
 
 **A) What is the Appendix?**
@@ -1409,6 +1417,172 @@ For Windows users who prefer not to use a VM, Anaconda is suggested for managing
 Setting up a VM involves installing VirtualBox, creating a new VM with Ubuntu 64-bit, allocating memory, attaching the Ubuntu ISO, installing the OS, and adding Guest Additions for usability. Data science libraries are then installed using apt-get and pip commands. TensorFlow is installed separately using the latest CPU-only version from the TensorFlow website.
 
 Once setup is complete, students can verify installations using simple Python scripts, clone course examples from GitHub, and use Sublime Text for editing. This ensures all students can run and test deep learning code without dependency or OS-related issues, providing a stable and uniform learning environment.
+
+# **IV) Exponential Smoothing and ETS Methods**
+
+**A) Exponential Smoothing Section Introduction**
+
+Everyone, and welcome back to the course, we are now going to introduce the next section.
+
+This section is about our first not naive forecasting method called ETS or Exponential Smoothing.
+
+This lecture will give you an outline for this section and a brief description of what you will learn.
+
+So the basic premise of this section is the moving average.
+
+The moving average is a simple concept. Imagine taking a window and sliding it across a time series. And at each point in the time series, you take the average of all the numbers in that window. That's called the simple moving average.
+
+So the simple moving average is equally weighted since each point you include in your average matters the same amount.
+
+In contrast, we also have the exponentially weighted moving average, which weights each point exponentially going back in time. This kind of makes sense because it's saying newer points matter more than older points. This would make sense if your time series is dynamic and changing over time.
+
+From this concept, we're going to build three different models that we can use to make forecasts.
+
+The first model is called simple exponential smoothing, which can be used to forecast non-trending, non-seasonal time series.
+
+The second model is called the Holt model, which can be used to forecast trending but non-seasonal time series.
+
+The third model is called the Holt-Winters model, which can be used to forecast time series with both trends and seasonality.
+
+So throughout this section, we'll look at how to apply these methods to various datasets as well as some real-life applications of these concepts.
+
+Now, I want to note that the theory in this section is essentially optional. There are basically two kinds of students who will take this course.
+
+One kind will see the equations and realize immediately why they are useful. It's because all these equations take on similar forms. So when you see these forms, it's immediately obvious how they are being applied. This should give you an intuitive understanding of these models and why they work.
+
+The second kind of student will see equations and get kind of intimidated. So for the second kind of student, I would recommend only watching the lecture (it's for beginners) and then skipping straight to the code. You won't have an in-depth understanding of each model, but you'll know how to apply it in the real world without having to be intimidated by math.
+
+So in other words, only look at the math if it actually helps you. If it doesn't, then feel free to settle for the plug-and-play approach.
+
+**Notes:**
+
+Section Topic: Introduction to ETS (Exponential Smoothing) for forecasting.
+
+Core Concept: Moving averages
+
+Simple Moving Average (SMA): Windowed average of a time series; equally weighted points.
+
+Exponentially Weighted Moving Average (EWMA): Weights points exponentially, giving more importance to recent points.
+
+Forecasting Models Built from Moving Average Concepts:
+
+Simple Exponential Smoothing: For non-trending, non-seasonal time series.
+
+Holt Model: For trending but non-seasonal time series.
+
+Holt-Winters Model: For time series with trends and seasonality.
+
+Application Focus:
+
+Apply models to various datasets and real-life scenarios.
+
+Two approaches for students:
+
+Theory-first: Understand equations and intuition behind models.
+
+Code-first (plug-and-play): Skip deep math and focus on applying models in practice.
+
+**Summary:**
+
+This section introduces ETS (Exponential Smoothing), a forecasting method based on moving averages. The simple moving average equally weights all points in a window, while the exponentially weighted moving average prioritizes recent observations.
+
+From these ideas, three forecasting models are derived:
+
+Simple Exponential Smoothing – for non-trending, non-seasonal data.
+
+Holt Model – for trending, non-seasonal data.
+
+Holt-Winters Model – for data with trends and seasonality.
+
+Students can choose a theory-first approach to understand the math behind the models or a code-first approach to apply them directly without delving into equations. The focus is on practical application, allowing learners to implement forecasts effectively in real-world scenarios.
+
+**B) Exponential Smoothing Intuition for Beginners**
+
+OK, so in this lecture, we are going to discuss ETS for Beginners.
+
+This is the lecture you should watch to gain some intuition behind the techniques in this section, but you don't necessarily care about how or why it works.
+
+So to recap what we said in the intro, the basic premise of this section is the moving average.
+
+The moving average is a simple concept. You take a window and slide it across the time series. And at each point in the time series, you take the average of all the numbers in that window. That's called the simple moving average in pandas. You can do this in just one line of code.
+
+Now, you might think that this is too simplistic for the real world, but in fact, this simple concept is used for algorithmic trading, for presenting COVID counts to the public, and so forth.
+
+Now, the simple moving average is, in fact, a bit too simple. One way to view it is it’s equally weighted since each point you include in your average matters the same amount. Basically, if you have n points, then each point gets a weight of 1/n.
+
+In contrast, we also have the exponentially weighted moving average, which weights each point exponentially going back in time. In this case, we don't have a sliding window, but instead all past data points count, going back to the start of your time series. The intuition behind this is that newer points matter more than older points, so they get higher weights.
+
+But essentially the effect is the same for both the SMA and the EWMA. The output looks like a smoothed-out version of the input. That is, the mean tends to lag a bit more, but they both basically do the same thing.
+
+So how can we use the exponentially weighted moving average to actually build a forecasting model? Well, the simplest method is called simple exponential smoothing. Basically, this assumes that your time series fluctuates around some constant value in time. Therefore, what the model tries to do is it tries to learn what this average value is by using the EWMA in order to forecast beyond the data. It simply assumes that the final EWMA value will propagate into the future.
+
+Of course, this makes sense according to the assumptions of the model, which is that the time series is a constant value, plus some random noise. Note that in its terminology, we call this constant value the level.
+
+OK, so the next model we are going to learn about is Holt’s linear trend model. Basically, it’s exactly how it sounds. This is a model that assumes there is a linear trend in your time series.
+
+Now, how it does this is pretty cool. It basically uses two exponentially weighted moving averages at the same time. So you have one moving average for the level and you also have one moving average to learn the trend. The forecast is then just a linear equation using this level and trend.
+
+You may recall from your high school math studies that the equation for a line is 𝑌=𝑀⋅𝑋+𝐵 Y=M⋅X+B, or slope multiplied by X value plus intercept. In this case, our slope is the trend, our X value is the number of steps in the forecast, and our intercept is the level. So you can see that with this model, our forecast becomes a line that can go in any direction, which is more powerful than the previous forecast, which had to be a horizontal line.
+
+The next model we will learn about is the full Holt-Winters model. This model adds seasonality. Basically, it’s still the same concepts where we use an exponentially weighted moving average to learn each component. That is to say, in addition to the level and trend, we now have yet another moving average to estimate the seasonal component.
+
+The seasonal component is assumed to be constant over each season. That means if we add +5 in May 2021, it will also add +5 in May 2022, +5 in May 2023, and so forth. The seasonal component is the part of the time series that repeats every season.
+
+The final thing I want to mention in this lecture is that there are different ways to combine each of these components. Initially, we assume that each component is additive, meaning the time series value is equal to the level plus the trend plus the seasonal component.
+
+However, it’s also possible for any of these relationships to be multiplicative instead. For example, we could have the level times the trend times the seasonal component. Note that this is another reason why taking the log is a useful transformation for time series. Recall that when you take the log of a product of variables, it turns into addition—in other words, 
+log ⁡(𝑎⋅𝑏)=log⁡(𝑎)+log⁡(𝑏)
+log(a⋅b)=log(a)+log(b).
+
+OK, so that’s the basic intuition for each technique we will study. Thanks for listening and I’ll see you in the next lecture.
+
+**Notes:**
+
+Lecture Topic: ETS for Beginners – building intuition without deep math.
+
+Core Concepts:
+
+Simple Moving Average (SMA): Sliding window average; equally weighted; simple but widely used in real-world applications like trading and COVID data.
+
+Exponentially Weighted Moving Average (EWMA): All past points included; newer points get higher weights; output is smoothed.
+
+Forecasting Models:
+
+Simple Exponential Smoothing: Assumes constant level + noise; uses EWMA to forecast future values.
+
+Holt’s Linear Trend Model: Uses two EWMAs – one for level, one for trend; forecast is a linear equation 𝑌=level+trend×steps
+
+Y=level+trend×steps.
+
+Holt-Winters Model: Adds seasonality component; level + trend + seasonality; seasonality can be additive or multiplicative.
+
+Additive vs Multiplicative:
+
+Additive: 𝑉𝑎𝑙𝑢𝑒=𝐿𝑒𝑣𝑒𝑙+𝑇𝑟𝑒𝑛𝑑+𝑆𝑒𝑎𝑠𝑜𝑛𝑎𝑙𝑖𝑡𝑦
+
+Value=Level+Trend+Seasonality
+
+Multiplicative: 𝑉𝑎𝑙𝑢𝑒=𝐿𝑒𝑣𝑒𝑙×𝑇𝑟𝑒𝑛𝑑×𝑆𝑒𝑎𝑠𝑜𝑛𝑎𝑙𝑖𝑡𝑦
+
+Value=Level×Trend×Seasonality
+
+Log transform helps convert multiplicative relationships into additive form.
+
+**Summary:**
+
+This lecture provides intuition for ETS (Exponential Smoothing) forecasting methods: SMA, EWMA, and three forecasting models (Simple, Holt, and Holt-Winters).
+
+SMA smooths the series with a sliding window; EWMA gives more weight to recent points.
+
+Simple Exponential Smoothing forecasts around a constant level with random noise.
+
+Holt’s Linear Trend Model forecasts with both level and trend, producing a linear forecast line.
+
+Holt-Winters Model extends Holt by adding seasonality, which can repeat every season and be additive or multiplicative.
+
+These methods allow students to forecast dynamic time series effectively, with logs used to simplify multiplicative components.
+
+**C) SMA Theory**
 
 
 
