@@ -45,6 +45,40 @@ Details my Skills on Time Series Analysis
 
 **C) SMA Theory**
 
+**D) SMA Code**
+
+**E) EWMA Theory**
+
+**F) EWMA Code**
+
+**G) SES Theory**
+
+**H) SES Code**
+
+**I) Holt's Linear Trend Model (Theory)**
+
+**J) Holt's Linear Trend Model (Code)**
+
+**K) Holt-Winters (Theory)**
+
+**L) Holt-Winters (Code)**
+
+**M) Walk-Forward Validation**
+
+**N) Walk-Forward Validation in Code**
+
+**O) Application: Sales Data**
+
+**P) Application: Stock Predictions**
+
+**Q) SMA Application: COVID-19 Counting**
+
+**R) SMA Application: Algorithmic Trading**
+
+**S) Exponential Smoothing Section Summary**
+
+**T) (Optional) More About State-Space Models**
+
 **XIV) Appendix / FAQ Intro**
 
 **A) What is the Appendix?**
@@ -1583,6 +1617,426 @@ Holt-Winters Model extends Holt by adding seasonality, which can repeat every se
 These methods allow students to forecast dynamic time series effectively, with logs used to simplify multiplicative components.
 
 **C) SMA Theory**
+
+In this lecture, we are going to discuss a very simple technique in time series analysis called the Simple Moving Average (SMA).
+
+The way it works is this. We start with a time series, then suppose we have some fixed-length window. At each point in the time series, we drag the window along and calculate the sample mean of all the points in that window. This is the simple moving average.
+
+Let's do an example. Suppose we have the numbers: 20, 8, 3, 6, 1, 1, 6, 5, 5, and let's say a window size is 3.
+
+The first value of the SMA is the average of 20, 8, 3, which is 3.33. The second value is the average of 0, 8, 3, which is 3.67. The third value is the average of 8, 3, 6, which is 5.67. I encourage you to calculate the rest yourself to get a better understanding.
+
+Note that we cannot fill in the first two values, since we don't have enough points to calculate an average. This works similarly to financial returns, where only the values we can calculate are considered.
+
+The purpose of the SMA, although simple, can actually be quite useful. For example, if we need to calculate the mean and variance of a stock, we might use these values to characterize the stock's distribution. Stock returns often exhibit volatility clustering, so instead of using all past data, we can use only the most recent values specified by the window size. This often gives a better estimate, since returns from six months or six years ago may not be relevant today.
+
+Learning the basic calculation behind the SMA also sets us up to understand the Exponentially Weighted Moving Average (EWMA), which in turn leads to more advanced time series forecasting methods. Think of SMA as a stepping stone to more complex methods.
+
+Now let’s discuss how the SMA looks in code. It’s convenient to use pandas. In pandas, we use the rolling function to specify that we want to perform a calculation on a rolling window. The input argument to this is the window size.
+
+import pandas as pd
+
+data = [20, 8, 3, 6, 1, 1, 6, 5, 5]
+series = pd.Series(data)
+sma = series.rolling(window=3).mean()
+print(sma)
+
+
+Note that rolling() does not return the SMA immediately, since you might want to calculate different statistics from the rolling window. It returns a rolling object, which can then be used to compute the mean, sum, min, max, variance, and so forth.
+
+If you have a rolling window of multiple columns, you can also calculate multi-dimensional statistics, such as covariance and correlation.
+
+In the next lecture, we will apply this code to actual data and see SMA in action.
+
+**Notes:**
+
+SMA (Simple Moving Average): Average of points in a fixed-length sliding window.
+
+Window size: Determines how many recent points are considered.
+
+First values: Cannot compute SMA until the window is full.
+
+Use cases:
+
+Stock return analysis
+
+Volatility estimation
+
+Financial or public data smoothing
+
+Python Implementation:
+
+pd.Series(data).rolling(window=3).mean()
+
+rolling() returns a rolling object for multiple statistics, not just the mean.
+
+Advanced relevance: SMA sets up the understanding of EWMA and more complex ETS forecasting methods.
+
+**Summary:**
+
+SMA is a simple but powerful technique to smooth time series.
+
+It calculates the mean over a rolling window, focusing on the most recent points.
+
+Helps in financial analysis where older data may be less relevant.
+
+Pandas’ rolling() function allows computation of mean, variance, min, max, and other statistics.
+
+SMA serves as a foundation for learning EWMA and more advanced forecasting models.
+
+**D) SMA Code**
+
+In this lecture, we are going to look at how to work with the Simple Moving Average (SMA) in code. This session will walk you through a Colab notebook, and I encourage you to try recreating it yourself with minimal references to reinforce learning.
+
+First, we start by downloading the CSV file esp5_close.csv, which contains closing prices only. Next, we import the standard libraries: pandas, matplotlib.pyplot, and numpy.
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+We read in the CSV file as a DataFrame using pandas:
+
+df = pd.read_csv("esp5_close.csv")
+
+
+We then grab the closing prices for Google, making a copy and assigning it to a variable goog_x.
+
+goog_x = df['GOOG'].copy()
+goog_x.head()
+
+
+Next, we plot the Google stock prices as a time series:
+
+goog_x.plot(title="Google Closing Prices")
+plt.show()
+
+
+To calculate the log returns for Google, we use:
+
+goog_returns = np.log(goog_x.pct_change() + 1)
+goog_returns.plot(title="Google Log Returns")
+plt.show()
+
+
+Now, we test our moving average code. We grab the Google column, call the rolling function with a window size of 10, then call mean() and assign it to a new column SMA_10:
+
+df['SMA_10'] = df['GOOG'].rolling(window=10).mean()
+df.head(20)
+
+
+As expected, the first nine rows of SMA_10 are NaN since no rolling window of size 10 exists for them. The first actual SMA value appears in the 10th row, which can also be verified manually.
+
+Next, we perform a sanity check on the rolling object type:
+
+type(df['GOOG'].rolling(window=10))
+# Output: pandas.core.window.rolling.Rolling
+
+
+Plotting the SMA alongside the original series shows a smoothed version of the Google stock prices:
+
+df[['GOOG', 'SMA_10']].plot(title="Google Price vs SMA_10")
+plt.show()
+
+
+We then calculate a SMA with a larger window, e.g., 50:
+
+df['SMA_50'] = df['GOOG'].rolling(window=50).mean()
+df[['GOOG', 'SMA_50']].plot(title="Google Price vs SMA_50")
+plt.show()
+
+
+With a larger window, the SMA is smoother, but exhibits lag, appearing behind the original series. Larger window sizes increase this lag effect.
+
+Next, we work with a multidimensional time series using both Google and Apple stocks:
+
+goog_aapl = df[['GOOG', 'AAPL']].copy()
+
+
+With multiple columns, the rolling function allows computation beyond the mean, such as covariance:
+
+rolling_cov = goog_aapl.rolling(window=50).cov()
+rolling_cov.tail()
+
+
+The resulting multi-level index stores a 2x2 covariance matrix for each date, essentially a 3D tensor represented in a 2D DataFrame. A single row can be selected to extract a specific covariance matrix.
+
+As in previous steps, we compute log returns for both Google and Apple:
+
+log_returns = np.log(goog_aapl.pct_change() + 1)
+
+
+Next, we calculate SMA for both log returns:
+
+log_returns['SMA_10_GOOG'] = log_returns['GOOG'].rolling(10).mean()
+log_returns['SMA_10_AAPL'] = log_returns['AAPL'].rolling(10).mean()
+log_returns[['SMA_10_GOOG', 'SMA_10_AAPL']].plot()
+plt.show()
+
+
+Plotting the SMAs alongside the returns shows a strong correlation between Apple and Google, with occasional outliers.
+
+Finally, we calculate rolling covariance and rolling correlation:
+
+rolling_cov = log_returns.rolling(50).cov()
+rolling_corr = log_returns.rolling(50).corr()
+rolling_corr.tail(8)
+
+
+The rolling correlation demonstrates that correlations change over time, sometimes even switching from negative to positive, illustrating the dynamic nature of stock relationships.
+
+**Notes:**
+
+SMA in code: Use pandas’ rolling(window).mean().
+
+Window size effect: Larger windows = smoother series but more lag.
+
+Rolling object: Returned by rolling(), used for mean, sum, min, max, var, cov, corr.
+
+Multidimensional time series: Can calculate covariance and correlation across multiple columns.
+
+Log returns: Used instead of prices to capture relative changes in finance.
+
+Visualization: Plotting SMAs alongside original series shows smoothing effect.
+
+Correlation changes over time: Dynamic financial relationships can be observed with rolling correlation.
+
+**Summary:**
+
+The SMA in code allows smoothing of time series using a rolling window.
+
+Larger windows produce smoother results but increase lag.
+
+Rolling statistics include mean, covariance, and correlation, supporting multidimensional analysis.
+
+Log returns are commonly used in finance instead of raw prices.
+
+Plotting SMAs helps visualize smoothing and correlation between multiple assets.
+
+Rolling correlation shows dynamic relationships between assets, changing over time.
+
+**E) EWMA Theory**
+
+In this lecture, we are going to discuss another kind of moving average called the Exponentially Weighted Moving Average (EWMA). Other names for this include exponential smoothing or a low-pass filter, which you may have encountered in statistics, machine learning, finance, or signal processing. EWMA is widely used and applicable across many domains.
+
+The lecture is divided into two parts: a short summary for quick understanding, and an optional in-depth discussion for those who want to know why EWMA is calculated the way it is.
+
+Short Summary:
+Unlike the arithmetic mean, which averages all past samples equally, the EWMA is calculated recursively or in an online manner:
+
+EWMA: 𝑡=𝛼⋅𝑋𝑡+(1−𝛼)⋅EWMA𝑡−1EWMAt​=α⋅Xt​+(1−α)⋅EWMAt−1
+	​
+At each step, the new moving average is a weighted sum of the latest sample 
+
+𝑋𝑡Xt
+	​
+and the previous moving average EWMA 𝑡−1EWMAt−1. 
+
+This makes the calculation simple and does not require storing all past samples.
+
+In code, EWMA can be calculated in pandas using the ewm() function:
+
+df['EWMA'] = df['GOOG'].ewm(alpha=0.1, adjust=False).mean()
+
+The parameter alpha acts as a decay factor:
+
+Alpha = 1: The EWMA equals the latest sample, ignoring past data.
+
+Alpha = 0: The EWMA equals the previous average, ignoring new data.
+
+Alpha near 1: New samples matter more, resulting in a noisier series that closely follows the original.
+
+Alpha near 0: Old data carries more weight, producing a smoother series.
+
+In-depth Discussion:
+The key motivation for EWMA is to handle large or infinite datasets efficiently. Calculating a standard sample mean requires summing all past samples, which grows linearly in time and space.
+
+Instead, we can compute the mean recursively:
+
+𝑋ˉ𝑡=(𝑡−1)𝑋ˉ𝑡−1+𝑋𝑡𝑡=(1−1𝑡)𝑋ˉ𝑡−1+1𝑡𝑋𝑡Xˉt​=t(t−1)Xˉt−1​+Xt​​=(1−t1​)Xˉt−1​+t1​Xt​
+
+This requires only the previous mean, the latest sample, and the sample count, reducing memory and computation requirements.
+
+If we want recent data to matter more, we replace 1/𝑡
+
+1/t with a constant alpha, giving the formula for EWMA. Recursively applying this formula shows that older samples’ weights decay exponentially over time:
+
+EWMA 𝑡=𝛼𝑋𝑡+𝛼(1−𝛼)𝑋𝑡−1+𝛼(1−𝛼)2𝑋𝑡−2+…
+
+EWMA t =αXt +α(1−α)X t−1 +α(1−α) 2 X t−2 +…
+
+Here, the latest sample has the highest weight, the second latest slightly less, and so on. This captures the intuition behind EWMA: more recent observations influence the moving average more strongly, while older data gradually fades in importance.
+
+Thus, EWMA extends the concept of the arithmetic mean by introducing exponentially decaying weights, allowing for smoother, more responsive moving averages compared to SMA.
+
+Python Code Example
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Sample data
+data = [20, 8, 3, 6, 1, 1, 6, 5, 5]
+series = pd.Series(data)
+
+# Simple EWMA with alpha=0.1
+ewma_01 = series.ewm(alpha=0.1, adjust=False).mean()
+print(ewma_01)
+
+# Plotting
+plt.plot(series, label="Original Data")
+plt.plot(ewma_01, label="EWMA alpha=0.1")
+plt.legend()
+plt.show()
+
+**Notes**
+
+EWMA / Exponential Smoothing / Low-Pass Filter: Weighted moving average emphasizing recent data.
+
+Recursive Formula: 
+EWMA 𝑡=𝛼𝑋𝑡+(1−𝛼)EWMA𝑡−1EWMAt​=αXt​+(1−α)EWMAt−1
+
+Alpha (decay factor):
+
+Close to 1 → new samples dominate → noisy, responsive series
+
+Close to 0 → older data dominates → smoother series
+
+Advantages:
+
+Efficient for large or streaming datasets
+
+No need to store all past data
+
+Captures dynamic trends better than SMA
+
+Exponential Decay: Weights of past samples decrease exponentially backward in time.
+
+**Summary**
+
+EWMA is a moving average that gives more weight to recent samples.
+
+It is calculated recursively, using only the latest sample and previous EWMA, making it efficient.
+
+The decay factor alpha controls how responsive or smooth the series is.
+
+EWMA is widely used in finance, statistics, machine learning, and signal processing.
+
+Conceptually, it extends the arithmetic mean by introducing exponentially decaying weights to past observations.
+
+**F) EWMA Code**
+
+In this lecture, we will look at how to compute the exponentially weighted moving average (EWMA) in code. As usual, the notebook title helps us identify which notebook we are working on.
+
+For this lecture, we will use the Airline Passengers dataset, a famous time series dataset widely used for teaching statistical and machine learning techniques. The dataset contains monthly passenger counts, indexed by month.
+
+First, we download the CSV for the airline passengers data and import necessary libraries:
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('airline_passengers.csv', index_col='Month')
+
+
+We check the first few rows with df.head() and verify that there are no missing values using df.isna().sum(). Plotting the data reveals a clear trend and a cyclical/seasonal component, making it ideal for EWMA analysis:
+
+df.plot(y='Passengers')
+plt.show()
+
+
+Next, we set our alpha parameter for the EWMA. Alpha can be thought of as a hyperparameter controlling the weight of recent samples:
+
+alpha = 0.2
+
+
+We then compute the EWMA using pandas’ ewm() function with adjust=False to match the standard EWMA formula:
+
+df['EWMA'] = df['Passengers'].ewm(alpha=alpha, adjust=False).mean()
+
+
+Inspecting the data type confirms that ewm() returns a EWM object. Plotting the EWMA against the original data shows a smoothed, adaptive version of the original series, similar to a delayed simple moving average:
+
+df.plot()
+plt.show()
+
+
+To better understand what pandas is doing under the hood, we can compute the EWMA manually. First, we create an empty list to store the values:
+
+manual_ewma = []
+for x in df['Passengers']:
+    if len(manual_ewma) == 0:
+        manual_ewma.append(x)  # Initialize with the first value
+    else:
+        x_hat = alpha * x + (1 - alpha) * manual_ewma[-1]
+        manual_ewma.append(x_hat)
+df['Manual_EWMA'] = manual_ewma
+
+
+Plotting this manual EWMA alongside the pandas EWMA shows that the values match exactly, confirming that pandas correctly implements the formula. We can clean up the dataframe by removing the manual column if desired:
+
+df.drop(columns=['Manual_EWMA'], inplace=True)
+
+
+This exercise helps us understand EWMA both conceptually and computationally, reinforcing the idea of a recursive, weighted moving average.
+
+**Notes:**
+
+Dataset: Airline Passengers – monthly counts.
+
+Libraries: pandas, numpy, matplotlib
+
+Alpha: Hyperparameter controlling weight of recent observations.
+
+Pandas EWMA: df['column'].ewm(alpha=alpha, adjust=False).mean()
+
+Manual EWMA: Computed recursively using:
+
+EWMA  𝑡=𝛼𝑋𝑡+(1−𝛼)EWMA𝑡−1EWMAt​=αXt​+(1−α)EWMAt−1
+	​
+Initialization: The first value can be copied from the first sample (common) or set to zero (bias introduced).
+
+Plotting: EWMA provides a smoothed, adaptive version of the original series, useful for visualizing trends while reducing noise.
+
+**Summary:**
+
+EWMA is implemented in pandas via ewm() with adjust=False.
+
+Alpha determines how much weight is given to the latest sample vs. past averages.
+
+Manual calculation confirms that EWMA is recursive, using the previous EWMA and the current sample.
+
+EWMA smooths the data while giving more importance to recent observations, making it suitable for trend analysis in time series.
+
+Understanding both pandas implementation and manual computation helps grasp the mechanics behind EWMA.
+
+**G) SES Theory**
+
+**H) SES Code**
+
+**I) Holt's Linear Trend Model (Theory)**
+
+**J) Holt's Linear Trend Model (Code)**
+
+**K) Holt-Winters (Theory)**
+
+**L) Holt-Winters (Code)**
+
+**M) Walk-Forward Validation**
+
+**N) Walk-Forward Validation in Code**
+
+**O) Application: Sales Data**
+
+**P) Application: Stock Predictions**
+
+**Q) SMA Application: COVID-19 Counting**
+
+**R) SMA Application: Algorithmic Trading**
+
+**S) Exponential Smoothing Section Summary**
+
+**T) (Optional) More About State-Space Models**
+
 
 
 
