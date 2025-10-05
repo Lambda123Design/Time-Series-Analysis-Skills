@@ -2011,13 +2011,457 @@ Understanding both pandas implementation and manual computation helps grasp the 
 
 **G) SES Theory**
 
+In this lecture, we are going to bridge the gap between exponential smoothing and the Holt-Winters model. This is going to be done in a series of steps.
 
+The first step is to understand exponential smoothing from a different perspective — that is, from the perspective of time series forecasting. Previously, our perspective was simply what are different ways that we can take the average in a time series. Now it's more about how do we fit a model to the time series and then use that model to forecast future values. Mathematically, this is the same as before, but philosophically it's different.
+
+To do this, we're going to have to introduce some new and more precise notation. Let's begin by reviewing the exponentially weighted moving average once again, but using our new notation.
+
+So now we have 
+
+𝑌^𝑡=𝛼𝑌𝑡+(1−𝛼)𝑌^𝑡−1Y^t​=αYt​+(1−α)Y^t−1​
+
+Here, 𝑌^𝑡Y^t  is the exponentially smooth version of Y at time 𝑡
+
+t,𝑌𝑡Yt is the value from our time series at time 𝑡 t, and  𝛼 α is again the smoothing parameter.
+
+The next step is to now phrase this as a forecasting model, in this form, the equation looks as follows:
+
+𝑌^𝑡+1∣𝑡=𝛼𝑌𝑡+(1−𝛼)𝑌^𝑡Y^t+1∣t =αYt +(1−α)Y^t
+
+You'll notice that I've introduced the vertical bar symbol, which in probability means “given”. On the left-hand side, 
+
+𝑌^𝑡+1∣𝑡Y^t+1∣t
+
+ is the exponentially smoothed forecast for time 𝑡+1 t+1 given the known values at time 𝑡 t. On the right-hand side, we have 𝛼𝑌𝑡αYt  as usual, plus (1−𝛼)
+
+(1−α) times the previous exponentially smoothed value.
+
+Notice something interesting about this: the time indices have changed. The 𝑌^Y^
+
+ on the left is for the time index 𝑡+1
+
+t+1, and the 
+
+ on the right has the time index 𝑌^Y^𝑡 t. If you look at the previous form, the left-hand side was at 𝑡 t and the right-hand side at 𝑡−1
+ 
+ t−1. This is probably confusing at this point, and that’s normal. It will make more sense when we look at the code and observe this behavior.
+
+Now, realize that I didn't invent this. This is all part of the Holt-Winters model. By the time we reach the full model and see it in action, this will make complete sense.
+
+Again, recognize that this is now a forecast. Previously we were not forecasting; we were just calculating averages. The forecast for the next timestep is equal to 
+𝛼
+α times the currently observed value plus (1−𝛼)
+
+(1−α) times the current exponentially smoothed fitted value.
+
+The next step is to express the simple exponential smoothing model in component form. This may seem like overkill because there is only a single component. However, the Holt-Winters model contains multiple components, which is where this becomes useful.
+
+In this form, the forecast equation looks as follows:
+
+𝑌^𝑡+ℎ∣𝑡=𝐿𝑡Y^t+h∣t =Lt
+	​
+Here, 𝐿𝑡Lt is just the exponentially smoothed average of 𝑌𝑡Yt (the time series). Notice that 𝐿𝑡Lt	​
+
+ now becomes the exponentially smoothed average, and 𝑌^𝑡+ℎ∣𝑡Y^t+h∣t becomes the forecast. 
+ 
+ Also, note that 𝐿𝑡Lt gets back its original time indices: 
+
+t on the left and 𝑡−1
+
+t−1 on the right. The forecast is simply assigned to be 𝐿𝑡Lt
+	​
+So what does 𝐿𝑡Lt represent? 𝐿𝑡Lt is called the level, which can be thought of as the moving average. The level is the average value of the signal in time, but the actual signal may fluctuate around that average level.
+
+One important note about this forecasting model: it is not very expressive. The forecast is simply a constant value. It’s always 𝐿𝑡Lt, no matter how many steps ahead you want to forecast. This is because the exponentially weighted moving average is essentially an estimate of the mean. Since all we're estimating is the mean, that’s the only thing we can predict after we stop collecting data.
+
+The last part of this lecture is how this works in code. Previously, we used pandas’ ewm() function to calculate the exponentially weighted moving average. This lecture didn’t introduce new concepts other than renaming variables.
+
+In the next coding lecture, we will use statsmodels to perform exponential smoothing, which aligns with the forecasting perspective. This allows exponential smoothing to be used as a predictive model rather than just a way of taking an average.
+
+Here’s how it works with statsmodels, which might feel different if you are used to scikit-learn:
+
+Import the class: "from statsmodels.tsa.holtwinters import SimpleExpSmoothing"
+
+Create a model object: "model = SimpleExpSmoothing(data)" — note that data should be a univariate time series
+
+Fit the model: "fit_model = model.fit(smoothing_level=alpha, optimized=False)"
+
+Differences from scikit-learn:
+
+In scikit-learn, data is passed to .fit(). In statsmodels, data is passed to the constructor.
+
+Hyperparameters such as alpha are passed to .fit().
+
+.fit() returns a results object (Holt-Winters results object), not the model itself.
+
+From the results object, you can:
+
+Get in-sample predictions: "fit_model.fittedvalues"
+
+Get forecast for out-of-sample steps: "forecast = fit_model.forecast(steps=10)" — this assumes the forecast starts at the timestep after the end of the training set
+
+This allows in-sample and out-of-sample forecasting, making exponential smoothing a true predictive model.
+
+**Notes**
+
+Forecasting perspective: Focus shifts from calculating averages to predicting future values.
+
+Component form:
+
+Level (𝐿𝑡Lt) = exponentially smoothed average of the series
+
+Forecast = 𝐿𝑡Lt for all future steps (constant)
+
+Simple exponential smoothing limitations:
+
+Forecast is constant (predicts mean)
+
+No trend or seasonal components captured
+
+Statsmodels vs pandas:
+
+statsmodels allows forecasting and a model-oriented API
+
+Constructor takes data; .fit() takes hyperparameters like alpha
+
+Holt-Winters link: Simple exponential smoothing is the level-only component of Holt-Winters
+
+**Summary**
+
+Exponential smoothing can be viewed as a forecasting model, not just a moving average.
+
+Forecast at time 𝑡+1t+1 is: 𝑌^𝑡+1∣𝑡=𝛼𝑌𝑡+(1−𝛼)𝑌^𝑡Y^t+1∣t =αY t+(1−α) Y^t
+
+In component form, the level 𝐿𝑡Lt is the smoothed average, and forecasts are constant 𝐿𝑡Lt values.
+
+Statsmodels enables fitting, in-sample prediction, and multi-step forecasting, bridging smoothing and predictive modeling.
+
+This sets the stage for Holt-Winters, which extends exponential smoothing with trend and seasonal components.
 
 **H) SES Code**
 
+In this lecture, we are going to implement simple exponential smoothing (SES) in code. As you recall, this is the same operation as the exponentially weighted moving average, but now we are treating it as a forecasting model rather than just a method of calculating a moving average.
+
+In addition, instead of using pandas, we'll be using the statsmodels library. The first thing we need to do is update statsmodels to ensure we are using the latest API. This can be done using the command:
+
+!pip install --upgrade statsmodels
+
+
+Note: APIs can change, so always check the latest documentation if errors occur.
+
+Next, we import the class "SimpleExpSmoothing" from statsmodels:
+
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing
+
+
+We then instantiate a model by passing in our passengers data to the constructor, and we call it ses_model:
+
+ses_model = SimpleExpSmoothing(passengers)
+
+
+You might notice warnings:
+
+No frequency information provided – Pandas didn’t automatically assign a frequency to the index.
+
+After 0 initialization must be handled – controls the first value of the moving average.
+
+We can fix the frequency by assigning a string to the index:
+
+passengers.index.freq = 'MS'  # MS means month start
+
+
+Next, we create another SES instance using the updated dataframe and set the initialization method to "legacy-heuristic" to match old versions:
+
+ses_model = SimpleExpSmoothing(passengers, initialization_method="legacy-heuristic")
+
+
+No warnings appear now. Next, we fit the model using a fixed alpha and optimized=False to replicate previous calculations:
+
+res = ses_model.fit(smoothing_level=0.2, optimized=False)
+
+
+Printing res shows a Holt-Winters results wrapper.
+
+Next, we predict over the entire dataset using:
+
+predictions = res.predict(start=passengers.index[0], end=passengers.index[-1])
+
+
+We can assign these predictions to a new column in the dataframe:
+
+passengers['SES'] = predictions
+
+
+We can also confirm that the predict function returns the same values as the fittedvalues attribute for in-sample data:
+
+res.predict(start=passengers.index[0], end=passengers.index[-1]).equals(res.fittedvalues)
+
+
+Next, we plot the dataframe. You may notice that the SES results are shifted up by one compared to WMA. This is due to the forecasting model assigning the level at the previous time step, so the SES model lags by one timestep. This is expected and correct — do not shift the data to match WMA.
+
+Treating SES as a Machine Learning Problem
+
+We now split the data into train and test sets to perform a proper forecast. For example, the last 12 points are the test set:
+
+train = passengers.iloc[:-12]
+test = passengers.iloc[-12:]
+
+
+We recreate the SES model with the train set:
+
+ses_model_train = SimpleExpSmoothing(train)
+res_train = ses_model_train.fit()  # optimized=True by default
+
+
+Now, the model finds the best alpha to minimize squared error on the train set.
+
+We create indices to separate train and test points:
+
+train_idx = passengers.index <= train.index[-1]
+test_idx = passengers.index > train.index[-1]
+
+
+We assign train predictions to the dataframe:
+
+passengers.loc[train_idx, 'SES_Fitted'] = res_train.fittedvalues
+
+
+We assign test forecasts to the dataframe using forecast(steps=12):
+
+passengers.loc[test_idx, 'SES_Fitted'] = res_train.forecast(steps=12)
+
+
+We then plot passengers vs SES_Fitted. The forecast is a horizontal straight line, reflecting the SES model’s nature. The train set prediction lags by one timestep, which is correct.
+
+If you try to shift it, it would break the forecasting alignment, and the model would appear to predict perfectly, which is not realistic.
+
+Observations about Alpha
+
+With the manually set alpha (0.2), the WMA was smooth and slow to track the signal. With the optimized alpha, the model reacts quickly to recent samples, indicating alpha is close to 1:
+
+print(res_train.model.params)
+
+
+This confirms that the SES model is nearly copying the last known value, reflecting its philosophy of giving more weight to recent observations.
+
+**Notes:**
+
+SES as a forecasting model: Treats smoothing as predicting future values, not just averaging.
+
+Frequency matters: Always set the frequency for the index, e.g., 'MS' for monthly data.
+
+Initialization method: "legacy-heuristic" ensures compatibility with older SES behavior.
+
+Predict vs fittedvalues: For in-sample data, these are identical.
+
+SES lag: Forecasts lag by one timestep — do not shift to align with the original series.
+
+Alpha: Manually set alpha gives smooth outputs; optimized alpha reacts quickly to recent values.
+
+Train/test split: SES can be treated like a machine learning model by fitting on a train set and forecasting test points.
+
+**Summary:**
+
+mplemented SES using statsmodels as a forecasting tool.
+
+Handled index frequency and initialization warnings.
+
+Demonstrated fitted values vs forecast, showing the expected lag of one timestep.
+
+Treated SES as a machine learning problem with train/test split.
+
+Observed that optimized alpha emphasizes recent observations over past averages.
+
 **I) Holt's Linear Trend Model (Theory)**
 
+In this lecture, we are going to discuss Holt’s linear trend model. Previously, we looked at simple exponential smoothing (SES) and noted that forecasts were always horizontal lines. Holt’s linear trend model extends SES so that we can capture and forecast trends.
+
+Let’s first consider what a linear trend might look like. Linear means a line. The general equation for a line is "Y = M*X + B". For a time series, we can write it as "Y_t = slope * T + Y_0". Here, the coefficient in front of T is called the slope, and the constant term is the intercept or "Y_0". The slope represents the amount that Y changes when T increases by one.
+
+Understanding this type of equation is key to understanding Holt’s linear trend model. The best way to understand it is to look at the model equations and decipher each component. The model is very similar to SES in component form, which is why it was important to rearrange SES equations that way.
+
+Whereas SES had two equations (forecast and level), Holt’s model now has three equations:
+
+Forecast equation
+
+Level equation
+
+Trend equation
+
+Forecast Equation
+
+The forecast equation in Holt’s model is:
+
+Y_hat_(t+h|t) = L_t + h * B_t
+
+
+Here, L_t is the level at time t, B_t is the trend (slope) at time t, and h is the number of steps ahead for the forecast. The forecast is no longer horizontal; it increases or decreases linearly depending on the trend. This justifies the name Holt’s Linear Trend Model.
+
+Level Equation
+
+The level equation is similar to SES but incorporates the trend:
+
+L_t = alpha * Y_t + (1 - alpha) * (L_(t-1) + B_(t-1))
+
+
+Here, L_t is the smoothed level at time t, alpha is the smoothing parameter for the level, and (L_(t-1) + B_(t-1)) is the previous smoothed value adjusted by the previous trend. The forecast for one step ahead is simply "L_(t-1) + B_(t-1)".
+
+Trend Equation
+
+The trend equation is also exponential smoothing:
+
+B_t = beta * (L_t - L_(t-1)) + (1 - beta) * B_(t-1)
+
+
+Here, B_t is the trend estimate at time t, and beta is the smoothing parameter for the trend. The term (L_t - L_(t-1)) represents the change in the smoothed level, which is a more accurate estimate of the slope because it reduces noise from the original signal.
+
+This equation makes sense because the trend is effectively the slope of the signal: "slope = change in Y / change in T". Since we update B_t every timestep, change in T = 1. Using the level differences instead of raw Y values reduces noise.
+
+Alpha and Beta as Hyperparameters
+
+Previously, alpha in SES could be chosen arbitrarily. With Holt’s model, both alpha and beta can be optimized to improve predictive accuracy. In a machine learning context, this involves minimizing the mean squared error over a training set. For those unfamiliar, statsmodels handles this automatically, so no manual tuning is required.
+
+High-Level Code Overview
+
+The workflow is similar to SES:
+
+Instantiate the model with the data:
+
+from statsmodels.tsa.holtwinters import Holt
+holt_model = Holt(passengers)
+
+
+Fit the model:
+
+res = holt_model.fit()
+
+
+Get in-sample predictions:
+
+fitted_values = res.fittedvalues
+
+
+Forecast future values:
+
+forecast_values = res.forecast(steps=12)
+
+
+Here, fittedvalues gives the smoothed and trend-adjusted series for the training data, and forecast provides predictions for h steps into the future.
+
+**Notes:**
+
+Holt’s model adds a trend component to SES, allowing forecasts to increase or decrease.
+
+Forecast equation: "Y_hat_(t+h|t) = L_t + h * B_t"
+
+Level equation: "L_t = alpha * Y_t + (1 - alpha) * (L_(t-1) + B_(t-1))"
+
+Trend equation: "B_t = beta * (L_t - L_(t-1)) + (1 - beta) * B_(t-1))"
+
+Alpha and Beta can be optimized automatically using statsmodels.
+
+Using level differences to estimate the trend reduces the effect of noise.
+
+**Summary:**
+
+Holt’s Linear Trend Model extends SES to account for trends.
+
+The model consists of forecast, level, and trend equations.
+
+Forecasts are no longer horizontal; they follow a linear trend.
+
+Level and trend are updated using exponential smoothing.
+
+Alpha and Beta can be optimized for predictive accuracy.
+
+In code, Holt’s model uses Holt(), fit(), fittedvalues, and forecast().
+
 **J) Holt's Linear Trend Model (Code)**
+
+In this lecture, we are going to apply Holt’s linear trend model in code. This lecture walks through a prepared Colab notebook, although a good exercise is to try recreating it yourself with as few references as possible.
+
+First, we import the Holt class from statsmodels:
+
+from statsmodels.tsa.holtwinters import Holt
+
+
+Next, we instantiate a Holt object by passing in our time series data:
+
+holt_model = Holt(passengers)
+
+
+Then, we fit the model using the fit() function:
+
+res = holt_model.fit()
+
+
+This returns a results object, which contains fitted values and forecast methods. We can assign the fitted values to a new column in our data frame:
+
+df['Holt'] = res.fittedvalues
+
+
+Next, we plot the original time series and the fitted Holt values. As before, the model appears to track the previous values, adjusting for trends, rather than simply aligning perfectly with the original series.
+
+Important: Do not shift the fitted values backwards to make them look like they match perfectly. Even though it may seem tempting, you must remain consistent. Shifting can make the model’s output appear correct superficially, but it is not philosophically correct, and it will cause problems with future models.
+
+Next, we perform a train-test split to generate a proper out-of-sample forecast.
+
+Create a new Holt object with the train set:
+
+holt_train = Holt(train_data)
+
+
+Fit the model on the training set:
+
+res_train = holt_train.fit()
+
+
+Assign fitted values to the corresponding train rows in the data frame:
+
+df.loc[train_index, 'Holt'] = res_train.fittedvalues
+
+
+Forecast the test set:
+
+df.loc[test_index, 'Holt'] = res_train.forecast(steps=len(test_index))
+
+
+Now, when we plot the original time series and the Holt column, we can observe both in-sample predictions and out-of-sample forecasts. The forecast produces a line trending upwards, reflecting the linear trend captured by the model. This behavior is exactly what Holt’s Linear Trend Model is designed to do.
+
+**Notes:**
+
+Import Holt from statsmodels: "from statsmodels.tsa.holtwinters import Holt"
+
+Instantiate the model with the data: "holt_model = Holt(passengers)"
+
+Fit the model: "res = holt_model.fit()"
+
+In-sample fitted values: "res.fittedvalues"
+
+Forecast out-of-sample: "res.forecast(steps=n)"
+
+Do not shift fitted values backward — the time indices of the forecast are aligned correctly with the model.
+
+Train-test split allows the model to forecast future values, producing a line that trends with the signal.
+
+**Summary:**
+
+Holt’s Linear Trend Model in code follows the same theory equations:
+
+Forecast: "Y_hat_(t+h|t) = L_t + h * B_t"
+
+Level: "L_t = alpha * Y_t + (1 - alpha) * (L_(t-1) + B_(t-1))"
+
+Trend: "B_t = beta * (L_t - L_(t-1)) + (1 - beta) * B_(t-1))"
+
+Fitted values track the trend without shifting.
+
+Forecasting uses the forecast(steps=n) function on the results object.
+
+The model produces upward or downward trending forecasts, rather than horizontal lines.
+
+Proper train-test split enables realistic out-of-sample predictions.
 
 **K) Holt-Winters (Theory)**
 
