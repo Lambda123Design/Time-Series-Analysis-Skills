@@ -2011,6 +2011,8 @@ Understanding both pandas implementation and manual computation helps grasp the 
 
 **G) SES Theory**
 
+
+
 **H) SES Code**
 
 **I) Holt's Linear Trend Model (Theory)**
