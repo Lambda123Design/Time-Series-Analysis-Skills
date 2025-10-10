@@ -2961,6 +2961,110 @@ For understanding, it’s better to implement manually — but in real projects,
 
 **N) Walk-Forward Validation in Code**
 
+In this lecture, we are going to look at how to implement walk forward validation in code.
+
+Let's start by downloading our dataset, which will be "Airline Passengers". The next step is to update "statsmodels" so we have the latest API. Then, we import the required modules for this script. The only new thing we’ll use is "itertools", which is very useful for looping through all possible combinations of options that we want to test.
+
+Next, we load the CSV file using "pd.read_csv()". Then we set the frequency of our dataset index to "months". It’s important to check the size of the DataFrame to ensure we don’t go too far back when we create our train set — we want enough data to train properly.
+
+Now, we set a few parameters for our test. We define the forecast horizon "H = 12" and the number of walk-forward steps "N = 10". The effective validation period, which we can call "n_test", is calculated as the length of the whole DataFrame minus H, minus the number of steps, plus one. It’s helpful to sketch this on paper to visualize how the windows move. There will also be some debugging code inside our function to confirm this logic.
+
+The next step is to set configuration options to try. Here, we’ll have several lists like "trend", "seasonal", "use_boxcox", "damped_trend", "initialization_method", etc. You can review the statsmodels documentation for details. One confusing point is about the "use_boxcox" parameter. According to the documentation, you should be able to pass the string "log", but this actually fails. As confirmed by the statsmodels source code, it throws an error if you do not pass True, False, or a numeric lambda value. Therefore, passing "log" is incorrect. The correct solution is to pass 0, since lambda = 0 corresponds to the log transform.
+
+Now, we implement the "walk_forward" function. It accepts arguments for each configuration option and a "debug" flag. Inside the function, we first create a list to store errors from each validation round. We also define variables for debugging: "seen_last" (a flag to check if we’ve reached the final row) and "steps_completed" (a counter that increments each iteration).
+
+Next, we enter the main loop. You can double-check its limits on paper. Inside the loop, we define our train and test sets by indexing into the DataFrame — note that we don’t actually need to physically “add” new data to the train set each time. Indexing automatically selects the correct slice, and this operation just creates a view, so it doesn’t consume extra memory.
+
+Then, we check if the final index of the test set matches the final index of the DataFrame. If it does, we set "seen_last = True" — this ensures we’ve looped through all the data. We increment "steps_completed" by one each round for debugging.
+
+Inside the loop, we instantiate our model, call the "fit()" function with the options we passed, and then generate forecasts using "forecast()". We compute the Mean Squared Error between the forecast and the test set, and append it to our list of errors. If the "debug" flag is True, we print the values of "seen_last" and "steps_completed" to confirm the loop boundaries.
+
+At the end of the function, we return the average of all collected errors using something like np.mean(errors).
+
+The next step is to test our "walk_forward" function by calling it with "debug=True". We check that "seen_last" is indeed True and that the number of completed steps equals the expected number. This confirms our logic works correctly.
+
+Now, we need to loop through every combination of our options to find the best configuration. One way would be multiple nested "for" loops, but that’s messy and inflexible. Instead, we use "itertools.product()", which efficiently loops through every possible combination from multiple lists. Normally, you’d pass all lists directly to the product() function, but since we have many, we can pack them into a tuple and then unpack them with "*" when calling.
+
+When we print what product() generates, we see it returns tuples of each possible combination of options — exactly what we want.
+
+Finally, we combine everything to find the best set of hyperparameters. We initialize "best_score = float('inf')" and "best_options = None". Then we iterate through all combinations using "itertools.product()". Inside the loop, we call "walk_forward()" with the current set of options (using "*" to unpack the tuple). If the returned score is lower than our current best score, we update "best_score" and "best_options".
+
+When we run this, we might see some warnings about overflows — that’s fine, it just means those parameter combinations resulted in unstable or poor models.
+
+In the end, we print the "best_score" and "best_options". We find that the best model uses a multiplicative trend and multiplicative seasonality, which makes sense since the airline passengers data shows increasing seasonal amplitude over time. The "damped_trend" option was True, "initialization_method" was "legacy-heuristic", and "use_boxcox" was False, meaning we got the best result without applying a log transform.
+
+**Notes:**
+
+Dataset: Airline passengers dataset loaded via "pd.read_csv()".
+
+Update library: Use latest "statsmodels" version.
+
+Import modules: Use "itertools" for generating parameter combinations.
+
+Set data frequency: Convert index to monthly frequency.
+
+Define parameters:
+
+Forecast horizon = 12
+
+Steps = 10
+
+Effective validation = total length − horizon − steps + 1
+
+Configuration options: Trend, seasonality, damping, Box-Cox, and initialization method lists.
+
+"use_boxcox='log'" fails → use 0 for log transform.
+
+Walk-forward function:
+
+Stores MSE errors for each step.
+
+Loops through train/test splits without creating new DataFrames.
+
+Trains "ExponentialSmoothing" model → fits → forecasts → computes MSE.
+
+Debug flags check loop correctness.
+
+Validation: Run with "debug=True" to verify step count and loop bounds.
+
+Grid search: Use "itertools.product()" to test all parameter combinations.
+
+Model selection: Track lowest average MSE → select best hyperparameters.
+
+Debugging Checks
+
+"seen_last" → confirms loop reaches final observation.
+
+"steps_completed" → matches expected number of steps.
+
+Final Best Model (for airline passengers)
+
+Trend: Multiplicative
+
+Seasonality: Multiplicative
+
+Damped trend: True
+
+Initialization: Legacy-heuristic
+
+Box-Cox transform: False
+
+**Summary:**
+
+Walk forward validation allows realistic time-series evaluation by training on increasing portions of past data and validating on future segments.
+We implemented it using the Airline Passengers dataset with the Holt-Winters model.
+The process included:
+
+Defining parameters (forecast horizon, steps),
+
+Writing a reusable walk-forward function to compute mean error per step,
+
+Using "itertools.product()" to test multiple configurations automatically,
+
+Finding the optimal parameter set based on lowest mean error.
+
+For the airline dataset, the best performance came from using multiplicative trend and seasonality, with no log transform, confirming that the data’s seasonal amplitude grows over time.
+
 **O) Application: Sales Data**
 
 **P) Application: Stock Predictions**
