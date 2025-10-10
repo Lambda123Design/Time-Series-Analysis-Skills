@@ -3067,19 +3067,514 @@ For the airline dataset, the best performance came from using multiplicative tre
 
 **O) Application: Sales Data**
 
+In this lecture, we are going to look at applying the Holt-Winters model to a new dataset.
+
+Before we begin, I want to give you an opportunity to stop the video and try this on your own. Since you’ve already learned all the code needed to complete this exercise, you technically do not need my help. If you want to treat this as an exercise, please download the dataset from the Euro provided in this notebook, close the notebook, and build the model independently. Otherwise, let’s continue.
+
+We start by importing the usual libraries: "pandas", "numpy", "matplotlib", and the "r2_score" metric. There is no special reason for using this metric, so feel free to choose your own. Next, we update "statsmodels" to have the latest version.
+
+Now, we download the dataset, which contains champagne sales — a typical kind of time series for this model. We run "df.head()" to check the contents of the CSV file. The header looks unusual, so we rename the columns for convenience.
+
+We then load the CSV into a DataFrame using "pd.read_csv()". Note that there are two junk lines at the bottom of the CSV file, so we pass "skipfooter=2" to remove them. Running "df.head()" again confirms that the first column is "Month" and the second column contains the champagne sales. We rename the sales column to a simpler name for easier handling.
+
+Next, we plot the data to visually inspect it. We notice that the dataset exhibits seasonality. There might be a slight trend, but the seasonal pattern is more obvious. Additionally, the seasonal amplitude is not constant — it seems to increase over time, at least for some period.
+
+We set the frequency of our index to "months" and then split the dataset into train and test sets, choosing "n_test = 12" to match the yearly seasonal cycle. We create a boolean series to easily index the train and test portions of the DataFrame.
+
+Now, we instantiate the Holt-Winters model. The only critical parameter is the seasonal period, which is 12 for monthly data. Other options can be experimented with based on what you have learned. We fit the model in the same block of code.
+
+Once fitted, we assign the predictions to the DataFrame. The train predictions go into a column "Winters_Train" and the test predictions into "Winters_Test". This allows us to visually distinguish the train and test predictions by plotting them in different colors.
+
+The plot shows a reasonably good fit. Finally, we calculate the R-squared for both train and test sets. The R-squared is high for the test set but slightly lower for the train set, which makes sense because the model struggles to perfectly predict the very high peaks in the data. You may experiment with other options to improve the performance further.
+
+**Notes:**
+
+Steps Overview:
+
+Dataset: Champagne sales dataset loaded via "pd.read_csv()".
+
+Libraries: "pandas", "numpy", "matplotlib", "r2_score".
+
+Update library: Use latest "statsmodels".
+
+Data Cleaning: Rename columns and skip junk lines ("skipfooter=2").
+
+Exploratory Analysis: Plot data → identify seasonality and slight trend.
+
+Index Frequency: Monthly frequency set for time series.
+
+Train-Test Split: "n_test = 12" (one seasonal cycle).
+
+Model: Instantiate Holt-Winters (ExponentialSmoothing) with seasonal period = 12.
+
+Fit: Call .fit() on training data.
+
+Predictions: Assign train predictions → "Winters_Train", test predictions → "Winters_Test".
+
+Plot Predictions: Compare against actual data.
+
+Evaluation: Compute R-squared for train and test sets.
+
+High R-squared for test, slightly lower for train due to difficulty predicting extreme peaks.
+
+Experimentation: Try different options to improve accuracy.
+
+**Summary:**
+
+This lecture demonstrates applying the Holt-Winters model to a real dataset of champagne sales. Steps included:
+
+Loading and cleaning the dataset,
+
+Setting monthly frequency and train-test split,
+
+Instantiating and fitting the Holt-Winters model with a seasonal period of 12,
+
+Assigning predictions for both train and test sets,
+
+Plotting and evaluating the model using R-squared.
+
+The model captured the seasonal patterns well, although very high peaks were slightly underestimated. Users are encouraged to try different options to optimize performance further.
+
 **P) Application: Stock Predictions**
+
+In this lecture, we are going to look at applying the Holt-Winters model to a new dataset, specifically stock prices.
+
+Before we begin, I want to give you an opportunity to stop the video and try this on your own. Since you already know the code needed, you technically do not need my help. If you want to treat this as an exercise, download the dataset from the Euro provided in this notebook, close it, and build the model independently. Otherwise, let’s continue.
+
+We skip the imports since these are the same as before. The next step is to download the data, which is a CSV file containing stock prices for multiple stocks in the S&P 500. Running "df.head()" shows that this CSV contains multiple tickers concatenated together. You can differentiate them by the "name" column.
+
+We load the data using "pd.read_csv()" and inspect the first few rows using "df.head()". There is nothing unexpected. Next, we grab the close prices for Google, though you can select any ticker you prefer. We then plot the close prices to visualize the data. Google appears to have performed well in the stock market over this period.
+
+The next step is to take the log transform of the close price. We also plot this new column to inspect it. After the log transformation, the trend appears more linear. However, stock prices only exist for trading days, which are not evenly spaced, and they do not exactly correspond to business days. Because of this, trying to set a frequency for the index will throw an error. We proceed without assigning a frequency.
+
+We split the data into train and test sets, choosing "n_test = 30". You can adjust this depending on your preference. Next, we instantiate the Holt-Winters model. Since we believe this dataset has no seasonality, we set "seasonal=None". You are free to experiment with different parameters. The log transform could have been handled internally by the model, but we did it manually. A warning may appear since the index does not have a frequency.
+
+We assign the predictions to the Google DataFrame. For the test set, we convert the results to a numpy array because not having a frequency causes misalignment of forecast indices.
+
+Next, we plot the predictions. The train set looks good, but this is misleading. To get a clearer picture, we plot only the last 100 data points. The result shows that the model mainly fits the train set because it essentially copies the last value. This makes sense because log prices of stocks nearly follow a random walk. The forecast for the test set is almost a straight line since the Holt linear trend model is being used.
+
+As an exercise, you can compute a forecasting metric for this prediction and compare it to a naive forecast, where the last known value from the train set is propagated through the forecast horizon. This produces a horizontal line, which can be compared to the Holt-Winters linear trend prediction to evaluate whether the linear trend actually improves over a naive forecast.
+
+**Notes:**
+
+Dataset & Libraries
+
+Dataset: S&P 500 stock prices CSV. Multiple tickers in one file.
+
+Libraries: "pandas", "numpy", "matplotlib".
+
+Data Preparation
+
+Load CSV: "pd.read_csv()".
+
+Inspect: "df.head()".
+
+Select a ticker (e.g., Google) for modeling.
+
+Take log transform of close price for linearity.
+
+Cannot set index frequency due to uneven trading days.
+
+Train-Test Split
+
+Choose "n_test = 30".
+
+Adjust as needed depending on data availability.
+
+Model Instantiation
+
+Use Holt-Winters: "ExponentialSmoothing()".
+
+Seasonal component: "seasonal=None".
+
+Optional: Log transform can be handled internally.
+
+Warning expected due to index without frequency.
+
+Predictions & Plotting
+
+Assign predictions to DataFrame.
+
+Test set results converted to numpy array for alignment.
+
+Plot predictions: focus on last 100 points for test evaluation.
+
+Observations
+
+Train set fits well — can be misleading.
+
+Test set shows linear trend; log prices behave almost like a random walk.
+
+Naive forecast (propagate last train value) can be a useful baseline.
+
+Compare naive vs Holt linear trend predictions.
+
+**Summary:**
+
+This lecture demonstrates applying the Holt-Winters model to stock price data. Key points:
+
+Stock prices are irregular (trading days) and require careful handling of frequency.
+
+Log transformation helps linearize the trend.
+
+Train-test split used "n_test = 30".
+
+Seasonal component removed (seasonal=None) as stock data lacks clear seasonality.
+
+Model appears to fit the train set well, but test set reveals limitations due to random walk behavior.
+
+A naive forecast using the last train value provides a simple baseline for comparison.
+
+The exercise encourages comparing Holt-Winters linear trend predictions against a naive forecast to evaluate performance on stock price data.
 
 **Q) SMA Application: COVID-19 Counting**
 
+In this lecture, we are going to discuss a contemporary application of the simple moving average. Since this concept is still fresh in our minds, it is a great opportunity to see how basic statistical tools are applied in the real world.
+
+During COVID-19, many data sources used a seven-day rolling average to report the trend of new cases. With what you have learned, you now have an insider view of the pros and cons of this approach. On one hand, it is very useful because it helps smooth out statistical noise. For example, data entry errors might occur and then be corrected later, which can skew daily case counts. Sometimes counts are underreported one day and overreported another day to correct for previous errors.
+
+Another reason for irregular counts is delayed reporting. Specific locations may not submit their counts on time to central authorities. This leads to undercounting on some days and overcounting on subsequent days when the backlogged counts are included. Additionally, counts from different sources can disagree, even for something as seemingly simple as counting cases. Real-world data is often messy and complex.
+
+There are also extreme cases where inaccuracies arise from intentional misinformation, such as directives from politicians to report false numbers. In these situations, simple moving averages cannot fix the underlying problem. However, they are effective when counts are merely delayed or backlogged rather than outright false.
+
+Using this knowledge, we can analyze seven-day rolling averages. They smooth statistical noise, but they also introduce a lag. For example, if a seven-day rolling average is very high, it indicates that the situation is serious, but it reflects conditions from several days ago — essentially old news.
+
+One might think that an exponential moving average (EMA) could help reduce lag. However, COVID-19 data is communicated to the general public, and most people do not understand EMA. Moreover, EMA requires a tunable decay parameter, which would make comparisons across different sources inconsistent.
+
+In summary, this lecture illustrates a real-world application of the simple moving average in science reporting. You have seen why it is useful for smoothing noisy data, but also its limitations due to lag and interpretability issues. This example highlights the challenges that data scientists face when transforming data in ways that are accurate, interpretable, and communicable to the public.
+
+**Notes:**
+
+Context
+
+COVID-19 daily case reporting.
+
+Many sources use 7-day rolling averages to smooth trends.
+
+Challenges in Raw Data
+
+Data entry errors — corrections can cause daily fluctuations.
+
+Delayed reporting — counts underreported one day, overreported the next.
+
+Multiple sources — counts may disagree.
+
+Intentional misinformation — sometimes figures are inaccurate.
+
+Benefits of Simple Moving Average
+
+Smooths out statistical noise caused by delays or backlogs.
+
+Easy for public to interpret compared to more complex methods.
+
+Limitations
+
+Introduces lag — high rolling averages reflect past days.
+
+Exponential moving average (EMA) not suitable for public communication.
+
+Hard to understand.
+
+Requires a decay rate parameter, making comparisons inconsistent.
+
+Key Takeaways
+
+SMA is useful but not perfect.
+
+Useful for smoothing, not for correcting false data.
+
+Trade-off between accuracy, timeliness, and public interpretability.
+
+**Summary:**
+
+This lecture demonstrates a practical use of the simple moving average in real-world science reporting, particularly for COVID-19 case trends.
+
+SMA helps smooth daily fluctuations due to noise, delayed reporting, or backlogs.
+
+Rolling averages introduce lag, showing past conditions rather than real-time trends.
+
+Exponential moving averages are technically better at reducing lag but are less interpretable for the general public.
+
+The lecture emphasizes the balance data scientists must strike between accuracy, communication, and simplicity when transforming data for public consumption.
+
 **R) SMA Application: Algorithmic Trading**
+
+In this lecture, we are going to discuss one very popular application of the simple moving average. While it might seem surprising that the simplest concepts from this section can be applied to algorithmic trading, it is true. Although algorithmic trading will not be taught in this course, it is a fun application, and you will see that this technique actually makes a lot of sense.
+
+The key idea with this method is to use two simple moving averages. We call one the fastest SMA and one the slowest SMA. The algorithm works as follows: whenever the fastest SMA crosses the slowest SMA from above, this is a signal to take a short position or sell. In the case where short selling is not allowed, this still serves as a signal to sell. Conversely, whenever the fastest SMA crosses the slowest SMA from below, this is a signal to take a long position or buy.
+
+To visualize this, let us look at a stock price time series along with the fast and slow SMAs. In the graphic, the fast SMA is orange, the slow SMA is green, and the original close price is blue. In the first part, when the orange SMA crosses the green SMA from above, the stock price falls, so it makes sense to sell at this point. In the second part, when the orange SMA crosses the green SMA from below, the stock price rises, so it makes sense to buy at this point.
+
+Here is another example of a sell signal. Note that this method can perform poorly at times because the SMA lags the true price. It is also important to optimize the window sizes for both SMAs, which has not been done in this example. Similarly, here is another example of a buy signal.
+
+Overall, this strategy generally makes sense. When prices are going down, the algorithm signals to sell, and when prices are going up, it signals to buy. Even though this is the simplest technique from the section, it demonstrates a practical and intuitive use of moving averages in trading.
+
+**Notes:**
+
+Concept
+
+Use two simple moving averages: fast SMA and slow SMA.
+
+Based on the crossover of SMAs, generate trading signals.
+
+Trading Signals
+
+Fast SMA crosses slow SMA from above → Sell / Short.
+
+Fast SMA crosses slow SMA from below → Buy / Long.
+
+Visualization
+
+Fast SMA: orange line.
+
+Slow SMA: green line.
+
+Original price: blue line.
+
+Crossovers indicate potential buy/sell points.
+
+Limitations
+
+SMA lags the true price → may miss early moves.
+
+Requires window size optimization for best performance.
+
+Key Takeaways
+
+Simple moving averages provide a basic, intuitive trading signal.
+
+Effective for identifying trends in price movements.
+
+Can be applied practically even with simple techniques.
+
+**Summary:**
+
+This lecture highlights a practical application of simple moving averages in algorithmic trading:
+
+Use two SMAs (fast and slow) to generate buy and sell signals based on crossovers.
+
+Sell when the fast SMA crosses the slow SMA from above; buy when it crosses from below.
+
+Advantages: simple, intuitive, and demonstrates trend-following strategy.
+
+Limitations: lagging signals and need for window optimization.
+
+Even the simplest moving average concepts can have real-world utility in trading and trend detection.
 
 **S) Exponential Smoothing Section Summary**
 
+In this lecture, we will be summarizing everything we learned in this section, which was all about exponential smoothing methods, also known as ETS models.
+
+We started this section with a very basic concept, the simple moving average. While it is indeed simple, we saw that it actually has many applications, including algorithmic trading.
+
+The next step was to consider the exponentially weighted moving average (EWMA). This kind of update forms the basis for all the models studied in this section.
+
+We then explored simple exponential smoothing, which is mathematically similar to the EWMA but framed differently. Instead of viewing it merely as a smoothing technique, we saw it as a predictive model.
+
+From there, we expanded the model by adding more components. Adding a trend component gave us the linear trend model. Adding a seasonal component resulted in the full Winters' model.
+
+We implemented the full Winters' model on the famous airline passengers dataset, and then applied it to additional datasets, including champagne sales and stock prices.
+
+We also discovered that there are many options when using the full Winters' model. Both trend and seasonality can be additive or multiplicative, the trend can be damped, and we can optionally use a Box-Cox transform.
+
+With so many options, we needed a way to systematically test them while avoiding overfitting. While traditional cross-validation works for non-time-series data, it must be used carefully when observations have time dependency. To address this, we learned about walk forward validation.
+
+Walk forward validation is not unique to ETS methods. The reason it was introduced here is because it is a convenient example. It can be used for any time series forecasting method. Although it may be tedious to implement for every script, it is still a valuable technique in practice.
+
+At this point, you may wonder why these models are called ETS, which stands for Error, Trend, Seasonality, and not Level, Trend, Seasonality. The reason is that the update equations can be transformed into state-space form. While the details are beyond this course, the concept is simple.
+
+For example, in simple exponential smoothing, we can rearrange the equations so that there is an error term, denoted by epsilon_t. This error is considered normally distributed noise or Gaussian white noise. Epsilon_t represents the residuals or innovations, which are the unpredictable parts of the time series.
+
+The hidden state, often denoted by L_t, is not directly observed but estimated from the data. Y_t is the actual observed value. Essentially, the error term captures the unpredictable portion of the series, which explains why these models are named Error, Trend, Seasonality. Time series modeled with ETS can be decomposed into these three components, providing a flexible framework for forecasting.
+
+**Notes:**
+
+Overview
+
+ETS models include Error, Trend, Seasonality components.
+
+The section started with simple moving averages and expanded to full Winters' model.
+
+Key Steps
+
+Simple Moving Average: basic smoothing, applied to trading and other scenarios.
+
+Exponentially Weighted Moving Average: introduces weighted updates.
+
+Simple Exponential Smoothing: framed as a predictive model.
+
+Linear Trend Model: adds trend to simple exponential smoothing.
+
+Full Winters’ Model: adds seasonality to trend model.
+
+Model Options
+
+Trend: additive or multiplicative
+
+Seasonality: additive or multiplicative
+
+Trend damping: optional
+
+Box-Cox transform: optional
+
+Validation
+
+Walk forward validation for time-dependent data.
+
+Important to avoid overfitting when tuning model options.
+
+ETS Naming
+
+Error (E): unpredictable residuals, innovations
+
+Trend (T): estimated underlying trend
+
+Seasonality (S): seasonal fluctuations
+
+The state-space form explains the focus on error rather than level.
+
+**Summary:**
+
+Exponential smoothing methods start from simple moving averages and progress to full Winters' models.
+
+Key components: error, trend, and seasonality.
+
+Model options allow flexibility in trend and seasonal behavior, damping, and data transformation.
+
+Walk forward validation is essential for time-dependent data to avoid overfitting.
+
+ETS models are named for Error, Trend, Seasonality because the error term captures unpredictable variations in the series, while trend and seasonality represent the structured parts.
+
+ETS provides a robust framework for time series forecasting, applicable to multiple real-world datasets.
+
 **T) (Optional) More About State-Space Models**
 
+In this video, we will be answering the question: why are state-based models of interest? Let’s start with the main points, and the rest of this video will expand on them.
+
+One important application of state-based models is that they allow us to model a wide variety of real-world systems. These include electrical systems, mechanical systems, economic systems, and biological systems. Essentially, almost anything you want to model can likely be represented as a state-based system.
+
+Another key point is that state-based models can be used for both continuous-time and discrete-time systems. In this video, we’ll look at a continuous-time system for demonstration purposes, even though such examples are less common in machine learning.
+
+A third point is that state-based representations form the foundation of control theory. This means we can design systems to achieve desired behaviors or move the system into a specific state of our choice.
+
+One surprising fact is that state-based models are applicable to both discrete and continuous-time systems. Continuous-time systems are often more realistic because they follow the laws of physics, but computers require a discrete-time representation.
+
+The most common type of state-based model is the linear state-space model. The discrete-time version can be written as:
+
+X[t] = A * X[t-1] + B * U[t]
+Y[t] = C * X[t] + D * U[t]
 
 
+Here, X[t] is the state vector, U[t] is the control input, Y[t] is the output, and A, B, C, D are matrices that define the system.
+
+The continuous-time version is similar, except we use derivatives:
+
+dX/dt = A * X + B * U
+Y = C * X + D * U
 
 
+Continuous-time models are useful for representing real physical systems, while discrete-time models are necessary for computer implementation.
+
+The equations might seem abstract, but they are generalizable to many fields, including physiology (drug administration), economics, and engineering. For this video, we’ll consider a simple mass-spring system, which requires only basic physics.
+
+Suppose we have a mass attached to a spring fixed to a wall. One force on the mass is the input force U, which is the force we can control via a computer program. The spring applies a force proportional to its displacement:
+
+F_spring = -K * X
 
 
+where K is the spring constant and X is the displacement from the neutral position.
+
+There is also a damping force due to friction, proportional to the velocity:
+
+F_damping = -B * X_dot
+
+
+Newton’s second law gives:
+
+M * X_double_dot = U - K * X - B * X_dot
+
+
+To convert this to state-space form, define a state vector:
+
+X_state = [X, X_dot]^T
+
+
+Now, let X1 = X and X2 = X_dot. Then we can rewrite:
+
+X1_dot = X2
+X2_dot = (U - K*X1 - B*X2)/M
+
+
+This can be expressed in matrix form:
+
+X_dot = A * X + B * U
+Y = C * X + D * U
+
+
+where matrices A and B are determined by physical constants, and C and D map the states to observed outputs.
+
+Not every state may be observed directly; for example, we may know the position but not the velocity. In this case, Y = C * X + D * U.
+
+This state-space representation is powerful. By analyzing eigenvalues of A, we can determine system stability. Moreover, it allows us to design controllers: choose a matrix K such that U = K * Y to achieve desired behavior.
+
+Interestingly, the popular ARIMA model originated from Box and Jenkins’ book, which highlights that forecasting is not the only goal—control has always been a part of time series analysis.
+
+In the real world, systems have noise. For example, if Y represents GPS measurements and X the true location, the Kalman filter can estimate X optimally using all previous measurements. This sequential approach allows forecasting of future states as well.
+
+Overall, the state-space representation is universally applicable, studied by engineers and statisticians, and useful in biology, economics, business, and more.
+
+**Notes:**
+
+Overview
+
+State-based models allow modeling of mechanical, electrical, economic, biological systems.
+
+Applicable in continuous-time and discrete-time systems.
+
+Forms the foundation of control theory: designing systems to reach desired states.
+
+Linear State-Space Model
+
+Discrete-time: X[t] = A*X[t-1] + B*U[t], Y[t] = C*X[t] + D*U[t]
+
+Continuous-time: dX/dt = A*X + B*U, Y = C*X + D*U
+
+Matrices A, B, C, D defined by system physics.
+
+Can model partial observability: not all state variables may be measured.
+
+Mass-Spring Example
+
+Input: U (force applied)
+
+Spring force: F_spring = -K*X
+
+Damping: F_damping = -B*X_dot
+
+Newton’s law: M*X_double_dot = U - K*X - B*X_dot
+
+State vector: X_state = [X, X_dot]^T
+
+Matrix form enables analysis and control.
+
+Applications
+
+Forecasting next states.
+
+Designing controllers: U = K*Y.
+
+ARIMA and Kalman filter are state-based approaches for forecasting and estimation.
+
+Applicable in engineering, biology, economics, business.
+
+**Summary:**
+
+State-space models generalize real-world systems into mathematical representations using states, inputs, and outputs.
+
+Linear state-space form allows analysis of system stability and design of controllers.
+
+Can handle continuous and discrete time.
+
+Useful for forecasting and controlling systems, including noisy systems via filters like Kalman filter.
+
+Provides a universal framework applicable across multiple domains.
